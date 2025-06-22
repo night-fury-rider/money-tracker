@@ -3,6 +3,7 @@ import { formatDate } from "$/services/UtilService";
 import { useTransactionStore } from "$/stores/transactionStore";
 import { useCategoryStore } from "$/stores/useCategoryStore";
 import calmBlueTheme from "$/theme";
+import { ICategory } from "$/types";
 
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useLocalSearchParams, useRouter } from "expo-router";
@@ -17,12 +18,6 @@ import {
 } from "react-native";
 import { Button, IconButton, Text, TextInput } from "react-native-paper";
 
-// TODO: Move the interface to types.ts
-interface Category {
-  name: string;
-  icon: string;
-}
-
 const AddTransactionScreen = () => {
   const router = useRouter();
   const params = useLocalSearchParams();
@@ -32,7 +27,7 @@ const AddTransactionScreen = () => {
   const [description, setDescription] = useState("");
   const [amount, setAmount] = useState("");
   const [date, setDate] = useState(new Date());
-  const [category, setCategory] = useState<Category | null>(null);
+  const [category, setCategory] = useState<ICategory | null>(null);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [dateFormat, setDateFormat] = useState(APP_CONFIG.dateFormats[0].value);
 

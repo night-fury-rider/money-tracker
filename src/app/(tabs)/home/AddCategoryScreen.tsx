@@ -1,4 +1,5 @@
 import { useCategoryStore } from "$/stores/useCategoryStore";
+import { ICategory } from "$/types";
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
 
@@ -20,13 +21,6 @@ import {
   useTheme,
 } from "react-native-paper";
 
-// TODO: Move the interface to types.ts
-interface Category {
-  name: string;
-  icon: string;
-  parent?: string;
-}
-
 const allIcons = [
   "cart",
   "car",
@@ -43,10 +37,10 @@ const AddCategoryScreen = () => {
   const params = useLocalSearchParams();
   const { setNewCategory } = useCategoryStore();
 
-  const [allCategories, setAllCategories] = useState<Category[]>([]);
+  const [allCategories, setAllCategories] = useState<ICategory[]>([]);
   const [categoryName, setCategoryName] = useState("");
   const [parentCategory, setParentCategory] = useState("");
-  const [filteredCategories, setFilteredCategories] = useState<Category[]>([]);
+  const [filteredCategories, setFilteredCategories] = useState<ICategory[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [selectedIcon, setSelectedIcon] = useState<string | null>(null);
   const [iconPickerVisible, setIconPickerVisible] = useState(false);
@@ -56,7 +50,7 @@ const AddCategoryScreen = () => {
       try {
         const parsed = JSON.parse(
           params.existingCategories as string
-        ) as Category[];
+        ) as ICategory[];
         setAllCategories(parsed);
       } catch (e) {
         console.error("Failed to parse categories from params", e);
@@ -81,7 +75,7 @@ const AddCategoryScreen = () => {
     setShowSuggestions(true);
   };
 
-  const selectSuggestion = (suggestion: Category) => {
+  const selectSuggestion = (suggestion: ICategory) => {
     setParentCategory(suggestion.name);
     setShowSuggestions(false);
     Keyboard.dismiss();

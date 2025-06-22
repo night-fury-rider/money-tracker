@@ -2,7 +2,12 @@ interface ICategory {
   name: string;
   icon: string;
   parent?: string;
-  subcategories?: string[];
+  subcategories?: ISubcategory[];
 }
 
-export { ICategory };
+interface ISubcategory {
+  name: string;
+  icon: string;
+}
+
+export { ICategory, ISubcategory };

@@ -1,4 +1,5 @@
 import { useCategoryStore } from "$/stores/useCategoryStore";
+import { ICategory } from "$/types";
 import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
 import {
@@ -10,23 +11,7 @@ import {
 } from "react-native";
 import { IconButton, List, Text, useTheme } from "react-native-paper";
 
-interface Subcategory {
-  name: string;
-  icon: string;
-}
-
-// TODO: Move the interface to types.ts
-interface Category {
-  name: string;
-  icon: string;
-  subcategories?: Subcategory[];
-}
-
-interface NewCategory extends Category {
-  parent: string;
-}
-
-const initialCategories: Category[] = [
+const initialCategories: ICategory[] = [
   {
     name: "Groceries",
     icon: "cart",
@@ -61,7 +46,7 @@ const CategoryListScreen = () => {
   const params = useLocalSearchParams();
   const { setSelectedCategory, storeCategories } = useCategoryStore();
 
-  const [categories, setCategories] = useState<Category[]>(initialCategories);
+  const [categories, setCategories] = useState<ICategory[]>(initialCategories);
 
   const handleSelect = (name: string, icon: string) => {
     setSelectedCategory({ name, icon });
@@ -89,7 +74,7 @@ const CategoryListScreen = () => {
         try {
           const parsedCategory = JSON.parse(
             params.newCategory as string
-          ) as NewCategory;
+          ) as ICategory;
 
           const newCategory = {
             name: parsedCategory.name,

@@ -1,35 +1,18 @@
 // stores/useCategoryStore.ts
 
 import APP_CONFIG from "$/constants/app.config.constants";
+import { ICategory } from "$/types";
 import * as SecureStore from "expo-secure-store";
 import { create } from "zustand";
 
-// TODO: Move the interface to types.ts
-interface Subcategory {
-  name: string;
-  icon: string;
-}
-
-// TODO: Move the interface to types.ts
-interface Category {
-  name: string;
-  icon: string;
-  subcategories?: Subcategory[];
-}
-
-// TODO: Move the interface to types.ts
-interface NewCategory extends Category {
-  parent?: string;
-}
-
 interface CategoryStore {
-  storeCategories: Category[];
+  storeCategories: ICategory[];
   selectedCategory: { name: string; icon: string } | null;
   setSelectedCategory: (category: { name: string; icon: string }) => void;
-  setNewCategory: (newCategory: NewCategory) => void;
+  setNewCategory: (newCategory: ICategory) => void;
 }
 
-const saveCategories = (categories: Category[]) =>
+const saveCategories = (categories: ICategory[]) =>
   SecureStore.setItemAsync(
     APP_CONFIG.storage.catgories,
     JSON.stringify(categories)
@@ -37,7 +20,7 @@ const saveCategories = (categories: Category[]) =>
 
 const loadCategories = async () => {
   const stored = await SecureStore.getItemAsync(APP_CONFIG.storage.catgories);
-  return stored ? (JSON.parse(stored) as Category[]) : null;
+  return stored ? (JSON.parse(stored) as ICategory[]) : null;
 };
 
 export const useCategoryStore = create<CategoryStore>((set, get) => ({
