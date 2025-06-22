@@ -35,7 +35,6 @@ const HomeScreen: React.FC = () => {
   const { data } = useTransactionStore();
 
   useEffect(() => {
-    console.log(`New Data: ${JSON.stringify(data)}`);
     const now = new Date();
     const currentMonthName = now.toLocaleString("default", { month: "long" });
     const currentYear = now.getFullYear().toString();
@@ -44,8 +43,6 @@ const HomeScreen: React.FC = () => {
     const thisMonth = yearData?.months.find(
       (month: IMonth) => month.title === currentMonthName
     );
-
-    console.log(`yearData: ${JSON.stringify(yearData)}`);
 
     if (thisMonth) {
       const sortedDays = [...thisMonth.days].sort(
@@ -123,6 +120,14 @@ const HomeScreen: React.FC = () => {
                         ₹{tx.amount}
                       </Text>
                     )}
+                    onPress={() =>
+                      router.push({
+                        pathname: "/(tabs)/home/ViewTransactionScreen",
+                        params: {
+                          transaction: JSON.stringify(tx),
+                        },
+                      })
+                    }
                   />
                 ))}
               </View>

@@ -4,17 +4,20 @@ import APP_CONFIG from "$/constants/app.config.constants";
 import * as SecureStore from "expo-secure-store";
 import { create } from "zustand";
 
+// TODO: Move the interface to types.ts
 interface Subcategory {
   name: string;
   icon: string;
 }
 
+// TODO: Move the interface to types.ts
 interface Category {
   name: string;
   icon: string;
   subcategories?: Subcategory[];
 }
 
+// TODO: Move the interface to types.ts
 interface NewCategory extends Category {
   parent?: string;
 }

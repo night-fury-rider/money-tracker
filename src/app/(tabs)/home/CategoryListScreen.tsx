@@ -15,6 +15,7 @@ interface Subcategory {
   icon: string;
 }
 
+// TODO: Move the interface to types.ts
 interface Category {
   name: string;
   icon: string;
@@ -85,7 +86,6 @@ const CategoryListScreen = () => {
   useFocusEffect(
     useCallback(() => {
       if (params?.newCategory) {
-        console.log(`New category`);
         try {
           const parsedCategory = JSON.parse(
             params.newCategory as string
@@ -100,12 +100,8 @@ const CategoryListScreen = () => {
             (c) => c.name.toLowerCase() === parsedCategory.name.toLowerCase()
           );
 
-          console.log(`alreadyExists: ${alreadyExists}`);
-
           if (!alreadyExists) {
             if (parsedCategory.parent) {
-              console.log(`parsedCategory: ${JSON.stringify(parsedCategory)}`);
-
               let tmpCategories = JSON.parse(JSON.stringify(categories));
               for (let i = 0; i < tmpCategories.length; i++) {
                 if (parsedCategory.parent === tmpCategories[i].name) {
@@ -117,7 +113,6 @@ const CategoryListScreen = () => {
                   break;
                 }
               }
-              console.log(`tmpCategories: ${JSON.stringify(tmpCategories)}`);
 
               setCategories(tmpCategories);
             } else {

@@ -20,6 +20,7 @@ import {
   useTheme,
 } from "react-native-paper";
 
+// TODO: Move the interface to types.ts
 interface Category {
   name: string;
   icon: string;
@@ -114,7 +115,6 @@ const AddCategoryScreen = () => {
       parent: parentCategory.trim() || undefined,
     });
 
-    console.log(`categoryName: ${categoryName}`);
     router.back();
   };
 

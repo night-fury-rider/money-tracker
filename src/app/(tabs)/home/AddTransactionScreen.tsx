@@ -17,6 +17,7 @@ import {
 } from "react-native";
 import { Button, IconButton, Text, TextInput } from "react-native-paper";
 
+// TODO: Move the interface to types.ts
 interface Category {
   name: string;
   icon: string;
@@ -79,7 +80,10 @@ const AddTransactionScreen = () => {
         month: date.toLocaleString("default", { month: "long" }),
         day: date.toISOString().split("T")[0],
       },
+      dateStr: formattedDate || "",
+      dateTimestamp: new Date(date).valueOf(),
       description,
+      id: Date.now().toString(),
       title: description,
     });
 

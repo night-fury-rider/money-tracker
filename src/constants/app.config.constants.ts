@@ -11,6 +11,15 @@ const APP_CONFIG = {
       value: "YYYY-MM-DD",
     },
   ],
+  dayNames: [
+    "Sunday",
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+  ],
   decimalPlaces: 2,
   font: {
     family: "IBM Plex Serif",
