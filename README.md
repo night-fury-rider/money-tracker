@@ -1,50 +1,69 @@
-# Welcome to your Expo app 👋
+# Money Tracker
+It is a user-friendly transaction tracking app that helps you monitor your spending in real time.
+It categorizes expenses and offers visual insights through charts and summaries.
+ 
+This app has following:
+<pre>
+✔️ View List of Transaction
+✔️ Add a transaction category.
+✔️ Add a transaction sub-category.  
+✔️ Update a transaction. 
+✔️ Delete a transaction.
+</pre>
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+--- 
 
-## Get started
 
-1. Install dependencies
+# Technologies and Libraries Used
 
-   ```bash
-   npm install
-   ```
+| Library                          | Version |
+| -------------------------------- | ------- |
+| [React Native](https://reactnative.dev/)                                                                 | v0.79   | 
+| [React](https://reactjs.org/)                                                                            | v19     |
+| [React Native Paper](https://callstack.github.io/react-native-paper/)                                    | v5      |
+| [Expo](https://expo.dev)                                                                                 | v53     |
+| [Zustand](https://github.com/pmndrs/zustand)              | v5      |
 
-2. Start the app
+--- 
 
-   ```bash
-   npx expo start
-   ```
 
-In the output, you'll find options to open the app in a
+# Getting Started
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+[Create a Logo](https://github.com/night-fury-rider/react-native-template/wiki/Create-a-Logo)
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+[Create Android Launcher Images](https://github.com/night-fury-rider/react-native-template/wiki/Create-Android-Launcher-Images)
 
-## Get a fresh project
 
-When you're ready, run:
+## Prerequisite
 
-```bash
-npm run reset-project
+- Mobile with USB debugging enabled
+- Mobile and laptop are on the same wifi.
+- Logos for android's `res` folder.
+
+## Install the app on mobile
+
+```
+npm run android
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+## Enable Wireless hot reload
+- Use [Expo Go App](https://docs.expo.dev/get-started/set-up-your-environment/) to do hot reload
+--- 
 
-## Learn more
 
-To learn more about developing your project with Expo, look at the following resources:
+# Create the release build
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+https://github.com/night-fury-rider/react-native-template/wiki/Create-the-release-build
 
-## Join the community
+--- 
 
-Join our community of developers creating universal apps.
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+# Deploy the App on Play Store
+
+https://github.com/night-fury-rider/react-native-template/wiki/Deploy-the-App-on-PlayStore
+
+--- 
+
+# Disclaimer
+
+This is a foundational app with a basic setup that will serve as the starting point for building my other React Native applications.
