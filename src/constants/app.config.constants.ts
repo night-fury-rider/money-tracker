@@ -32,7 +32,7 @@ const APP_CONFIG = {
   currencies: [
     {
       title: "INR",
-      value: "₹ani",
+      value: "₹",
     },
     {
       title: "USD",
