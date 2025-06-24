@@ -1,5 +1,9 @@
 import APP_CONFIG from "$/constants/app.config.constants";
 import { ROUTES } from "$/constants/routes.constants";
+import {
+  COMMON_STRS,
+  VIEW_TRANSACTION_SCREEN_STRS,
+} from "$/constants/strings.constants";
 import { formatDate } from "$/services/UtilService";
 import { useTransactionStore } from "$/stores/transactionStore";
 import { useCategoryStore } from "$/stores/useCategoryStore";
@@ -110,8 +114,6 @@ const ViewTransactionScreen = () => {
   useEffect(() => {
     if (params?.selectedCategory) {
       const selected = JSON.parse(params.selectedCategory as string);
-
-      console.log(`selectedCategory from param: ${JSON.stringify(selected)}`);
       setCategory(selected);
     }
   }, [params?.selectedCategory]);
@@ -137,16 +139,27 @@ const ViewTransactionScreen = () => {
   };
 
   const confirmDelete = () => {
-    Alert.alert("Delete", "Are you sure you want to delete this transaction?", [
-      { text: "Cancel", style: "cancel" },
-      { text: "Delete", style: "destructive", onPress: handleDelete },
-    ]);
+    Alert.alert(
+      VIEW_TRANSACTION_SCREEN_STRS.confirmDelete.title,
+      VIEW_TRANSACTION_SCREEN_STRS.confirmDelete.message,
+      [
+        {
+          text: VIEW_TRANSACTION_SCREEN_STRS.confirmDelete.cancelBtnLabel,
+          style: "cancel",
+        },
+        {
+          text: VIEW_TRANSACTION_SCREEN_STRS.confirmDelete.deleteBtnLabel,
+          style: "destructive",
+          onPress: handleDelete,
+        },
+      ]
+    );
   };
 
   const handleDelete = () => {
     deleteTransaction({
       amount: parseFloat(amount),
-      category: category?.name || "Uncategorized",
+      category: category?.name || COMMON_STRS.uncategorized,
       date: {
         year: String(date.getFullYear()),
         month: date.toLocaleString("default", { month: "long" }),
@@ -182,7 +195,7 @@ const ViewTransactionScreen = () => {
 
     const transactionObj = {
       amount: parseFloat(amount),
-      category: category?.name || "Uncategorized",
+      category: category?.name || COMMON_STRS.uncategorized,
       date: {
         year: String(date.getFullYear()),
         month: date.toLocaleString("default", { month: "long" }),
