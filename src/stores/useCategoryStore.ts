@@ -24,34 +24,7 @@ const loadCategories = async () => {
 };
 
 export const useCategoryStore = create<CategoryStore>((set, get) => ({
-  storeCategories: [
-    {
-      name: "Groceries",
-      icon: "cart",
-      subcategories: [
-        { name: "Fruits", icon: "apple" },
-        { name: "Vegetables", icon: "leaf" },
-      ],
-    },
-    {
-      name: "Transport",
-      icon: "car",
-      subcategories: [
-        { name: "Fuel", icon: "gas-station" },
-        { name: "Taxi", icon: "taxi" },
-      ],
-    },
-    {
-      name: "Entertainment",
-      icon: "movie",
-      subcategories: [
-        { name: "Movies", icon: "film" },
-        { name: "Games", icon: "gamepad" },
-      ],
-    },
-    { name: "Rent", icon: "home" },
-    { name: "Utilities", icon: "flash" },
-  ],
+  storeCategories: APP_CONFIG.categories,
   selectedCategory: null,
   setSelectedCategory: (category) => set({ selectedCategory: category }),
 

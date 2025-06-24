@@ -1,4 +1,6 @@
+import APP_CONFIG from "$/constants/app.config.constants";
 import { ROUTES } from "$/constants/routes.constants";
+import { CATEGORY_LIST_SCREEN_STRS } from "$/constants/strings.constants";
 import { useCategoryStore } from "$/stores/useCategoryStore";
 import { ICategory } from "$/types";
 import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
@@ -12,34 +14,7 @@ import {
 } from "react-native";
 import { IconButton, List, Text, useTheme } from "react-native-paper";
 
-const initialCategories: ICategory[] = [
-  {
-    name: "Groceries",
-    icon: "cart",
-    subcategories: [
-      { name: "Fruits", icon: "apple" },
-      { name: "Vegetables", icon: "leaf" },
-    ],
-  },
-  {
-    name: "Transport",
-    icon: "car",
-    subcategories: [
-      { name: "Fuel", icon: "gas-station" },
-      { name: "Taxi", icon: "taxi" },
-    ],
-  },
-  {
-    name: "Entertainment",
-    icon: "movie",
-    subcategories: [
-      { name: "Movies", icon: "film" },
-      { name: "Games", icon: "gamepad" },
-    ],
-  },
-  { name: "Rent", icon: "home" },
-  { name: "Utilities", icon: "flash" },
-];
+const initialCategories: ICategory[] = APP_CONFIG.categories;
 
 const CategoryListScreen = () => {
   const theme = useTheme();
@@ -106,7 +81,7 @@ const CategoryListScreen = () => {
             }
           }
         } catch (e) {
-          console.error("Invalid newCategory param:", e);
+          console.error(CATEGORY_LIST_SCREEN_STRS.invalidNewCategoryParam, e);
         }
       }
     }, [params?.newCategory])

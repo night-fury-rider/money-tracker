@@ -1,6 +1,34 @@
 // This file is intended to serve as the single source of truth for all app level configurations.
 
 const APP_CONFIG = {
+  categories: [
+    {
+      name: "Groceries",
+      icon: "cart",
+      subcategories: [
+        { name: "Fruits", icon: "apple" },
+        { name: "Vegetables", icon: "leaf" },
+      ],
+    },
+    {
+      name: "Transport",
+      icon: "car",
+      subcategories: [
+        { name: "Fuel", icon: "gas-station" },
+        { name: "Taxi", icon: "taxi" },
+      ],
+    },
+    {
+      name: "Entertainment",
+      icon: "movie",
+      subcategories: [
+        { name: "Movies", icon: "film" },
+        { name: "Games", icon: "gamepad" },
+      ],
+    },
+    { name: "Rent", icon: "home" },
+    { name: "Utilities", icon: "flash" },
+  ],
   dateFormats: [
     {
       title: "DD-MMM-YYYY",
