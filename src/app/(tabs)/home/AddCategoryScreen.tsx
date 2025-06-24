@@ -1,3 +1,8 @@
+import APP_CONFIG from "$/constants/app.config.constants";
+import {
+  ADD_CATEGORY_SCREEN_STRS,
+  ADD_TRANSACTION_SCREEN_STRS,
+} from "$/constants/strings.constants";
 import { useCategoryStore } from "$/stores/useCategoryStore";
 import { ICategory } from "$/types";
 import { router, useLocalSearchParams } from "expo-router";
@@ -21,17 +26,6 @@ import {
   useTheme,
 } from "react-native-paper";
 
-const allIcons = [
-  "cart",
-  "car",
-  "home",
-  "flash",
-  "movie",
-  "cash",
-  "heart",
-  "star",
-];
-
 const AddCategoryScreen = () => {
   const theme = useTheme();
   const params = useLocalSearchParams();
@@ -53,7 +47,10 @@ const AddCategoryScreen = () => {
         ) as ICategory[];
         setAllCategories(parsed);
       } catch (e) {
-        console.error("Failed to parse categories from params", e);
+        console.error(
+          ADD_TRANSACTION_SCREEN_STRS.categoryParsingFailedFromParams,
+          e
+        );
       }
     }
   }, [params.existingCategories]);
@@ -90,7 +87,7 @@ const AddCategoryScreen = () => {
 
   const handleAddCategory = () => {
     if (!categoryName.trim()) {
-      alert("Please enter a category name");
+      alert(ADD_TRANSACTION_SCREEN_STRS.addCategoryOption.enterCategory);
       return;
     }
 
@@ -99,7 +96,7 @@ const AddCategoryScreen = () => {
         (c) => c.name.toLowerCase() === categoryName.trim().toLowerCase()
       )
     ) {
-      alert("Category already exists");
+      alert(ADD_TRANSACTION_SCREEN_STRS.addCategoryOption.categoryExists);
       return;
     }
 
@@ -115,10 +112,8 @@ const AddCategoryScreen = () => {
   return (
     <PaperProvider theme={theme}>
       <View style={styles.container}>
-        <Text style={styles.title}>Add New Category</Text>
-
         <TextInput
-          label="Category Name"
+          label={ADD_CATEGORY_SCREEN_STRS.categoryInputLabel}
           mode="outlined"
           value={categoryName}
           onChangeText={setCategoryName}
@@ -127,7 +122,7 @@ const AddCategoryScreen = () => {
         />
 
         <TextInput
-          label="Parent Category (optional)"
+          label={ADD_CATEGORY_SCREEN_STRS.parentCategoryLabel}
           mode="outlined"
           value={parentCategory}
           onChangeText={handleParentCategoryChange}
@@ -167,7 +162,7 @@ const AddCategoryScreen = () => {
           onPress={handleAddCategory}
           style={styles.addButton}
         >
-          Add Category
+          {ADD_CATEGORY_SCREEN_STRS.primaryBtnLabel}
         </Button>
 
         <Portal>
@@ -176,9 +171,11 @@ const AddCategoryScreen = () => {
             onDismiss={() => setIconPickerVisible(false)}
             contentContainerStyle={styles.iconPickerModal}
           >
-            <Text style={styles.iconPickerTitle}>Select an Icon</Text>
+            <Text style={styles.iconPickerTitle}>
+              {ADD_CATEGORY_SCREEN_STRS.iconPickerTitle}
+            </Text>
             <FlatList
-              data={allIcons}
+              data={APP_CONFIG.icons}
               keyExtractor={(item) => item}
               numColumns={4}
               renderItem={({ item }) => (
@@ -190,7 +187,9 @@ const AddCategoryScreen = () => {
                 </TouchableOpacity>
               )}
             />
-            <Button onPress={() => setIconPickerVisible(false)}>Cancel</Button>
+            <Button onPress={() => setIconPickerVisible(false)}>
+              {ADD_CATEGORY_SCREEN_STRS.cancel}
+            </Button>
           </Modal>
         </Portal>
       </View>

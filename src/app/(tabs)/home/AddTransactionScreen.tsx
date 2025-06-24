@@ -1,4 +1,6 @@
 import APP_CONFIG from "$/constants/app.config.constants";
+import { ROUTES } from "$/constants/routes.constants";
+import { COMMON_STRS } from "$/constants/strings.constants";
 import { formatDate } from "$/services/UtilService";
 import { useTransactionStore } from "$/stores/transactionStore";
 import { useCategoryStore } from "$/stores/useCategoryStore";
@@ -69,7 +71,7 @@ const AddTransactionScreen = () => {
   const handleSave = () => {
     addTransaction({
       amount: parseFloat(amount),
-      category: selectedCategory?.name || "Uncategorized",
+      category: selectedCategory?.name || COMMON_STRS.uncategorized,
       date: {
         year: String(date.getFullYear()),
         month: date.toLocaleString("default", { month: "long" }),
@@ -95,7 +97,7 @@ const AddTransactionScreen = () => {
 
   const openCategoryList = () => {
     router.push({
-      pathname: "/(tabs)/home/CategoryListScreen",
+      pathname: ROUTES.categoryListScreen,
       params: {
         description,
         amount,
