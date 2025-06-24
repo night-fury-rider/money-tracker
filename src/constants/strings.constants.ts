@@ -48,6 +48,9 @@ const COMMON_STRS = {
 };
 
 const HOME_SCREEN_STRS = {
+  appbar: {
+    title: "Transactions",
+  },
   comingSoon: "Dashboard data will appear here.",
   searchBox: {
     placeholder: "Search Item",
@@ -62,6 +65,12 @@ const SETTINGS_TAB_STRS = {
 
 const VIEW_TRANSACTION_SCREEN_STRS = {
   title: "",
+  confirmDelete: {
+    cancelBtnLabel: "Cancel",
+    deleteBtnLabel: "Delete",
+    message: "Are you sure you want to delete this transaction?",
+    title: "Delete",
+  },
 };
 
 export {
