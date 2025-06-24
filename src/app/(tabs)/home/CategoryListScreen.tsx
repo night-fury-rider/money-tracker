@@ -1,3 +1,4 @@
+import { ROUTES } from "$/constants/routes.constants";
 import { useCategoryStore } from "$/stores/useCategoryStore";
 import { ICategory } from "$/types";
 import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
@@ -55,7 +56,7 @@ const CategoryListScreen = () => {
 
   const handleAddCategoryScreen = () => {
     router.push({
-      pathname: "/(tabs)/home/AddCategoryScreen",
+      pathname: ROUTES.addCategoryScreen,
       params: {
         existingCategories: JSON.stringify(categories),
       },

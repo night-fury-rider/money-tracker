@@ -1,4 +1,5 @@
 import APP_CONFIG from "$/constants/app.config.constants";
+import { ROUTES } from "$/constants/routes.constants";
 import { formatDate } from "$/services/UtilService";
 import { useTransactionStore } from "$/stores/transactionStore";
 import { useCategoryStore } from "$/stores/useCategoryStore";
@@ -126,7 +127,7 @@ const ViewTransactionScreen = () => {
 
   const openCategoryList = () => {
     router.push({
-      pathname: "/(tabs)/home/CategoryListScreen",
+      pathname: ROUTES.categoryListScreen,
       params: {
         description,
         amount,

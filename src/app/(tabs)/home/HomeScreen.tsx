@@ -1,3 +1,4 @@
+import { ROUTES } from "$/constants/routes.constants";
 import { useTransactionStore } from "$/stores/transactionStore";
 import calmBlueTheme from "$/theme";
 import { useRouter } from "expo-router";
@@ -65,7 +66,7 @@ const HomeScreen: React.FC = () => {
   }, [data]);
 
   const handleAddTransaction = () => {
-    router.push("/(tabs)/home/AddTransactionScreen");
+    router.push(ROUTES.addTransactionScreen);
   };
 
   return (
@@ -122,7 +123,7 @@ const HomeScreen: React.FC = () => {
                     )}
                     onPress={() =>
                       router.push({
-                        pathname: "/(tabs)/home/ViewTransactionScreen",
+                        pathname: ROUTES.viewTransactionScreen,
                         params: {
                           transaction: JSON.stringify(tx),
                         },
