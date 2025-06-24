@@ -24,6 +24,7 @@ const ADD_TRANSACTION_SCREEN_STRS = {
 };
 
 const CATEGORY_LIST_SCREEN_STRS = {
+  invalidNewCategoryParam: "Invalid newCategory param:",
   title: "Select Category",
 };
 
