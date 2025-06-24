@@ -29,6 +29,16 @@ const APP_CONFIG = {
     { name: "Rent", icon: "home" },
     { name: "Utilities", icon: "flash" },
   ],
+  currencies: [
+    {
+      title: "INR",
+      value: "₹ani",
+    },
+    {
+      title: "USD",
+      value: "$",
+    },
+  ],
   dateFormats: [
     {
       title: "DD-MMM-YYYY",
