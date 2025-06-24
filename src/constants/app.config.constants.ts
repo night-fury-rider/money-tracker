@@ -24,6 +24,7 @@ const APP_CONFIG = {
   font: {
     family: "IBM Plex Serif",
   },
+  icons: ["cart", "car", "home", "flash", "movie", "cash", "heart", "star"],
   languages: [
     {
       title: "English",
