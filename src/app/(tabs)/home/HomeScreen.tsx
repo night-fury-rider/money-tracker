@@ -1,9 +1,13 @@
+import APP_CONFIG from "$/constants/app.config.constants";
 import { ROUTES } from "$/constants/routes.constants";
+import { HOME_SCREEN_STRS } from "$/constants/strings.constants";
 import { useTransactionStore } from "$/stores/transactionStore";
 import calmBlueTheme from "$/theme";
 import { useRouter } from "expo-router";
+import * as SecureStore from "expo-secure-store";
 import React, { useEffect, useState } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
+
 import {
   Appbar,
   Card,
@@ -34,6 +38,27 @@ const HomeScreen: React.FC = () => {
   const router = useRouter();
   const [monthData, setMonthData] = useState<IMonth | null>(null);
   const { data } = useTransactionStore();
+  const [currency, setCurrency] = useState(APP_CONFIG.currencies[0].value);
+
+  // Load date format from SecureStore
+  const getCurrency = async () => {
+    const storedFormat = await SecureStore.getItemAsync(
+      APP_CONFIG.storage.storageCurrencyUnit
+    );
+    if (storedFormat) {
+      setCurrency(storedFormat);
+    } else {
+      setCurrency(APP_CONFIG.currencies[0].value);
+      await SecureStore.setItemAsync(
+        APP_CONFIG.storage.storageCurrencyUnit,
+        APP_CONFIG.currencies[0].value
+      );
+    }
+  };
+
+  useEffect(() => {
+    getCurrency();
+  }, []);
 
   useEffect(() => {
     const now = new Date();
@@ -74,7 +99,7 @@ const HomeScreen: React.FC = () => {
       <View style={styles.screen}>
         <Appbar.Header elevated>
           <Appbar.Content
-            title="Transactions"
+            title={HOME_SCREEN_STRS.appbar.title}
             titleStyle={{ fontWeight: "600" }}
           />
           <Appbar.Action icon="magnify" onPress={() => {}} />
@@ -96,7 +121,8 @@ const HomeScreen: React.FC = () => {
                       { color: calmBlueTheme.colors.primary },
                     ]}
                   >
-                    ₹{day.amount}
+                    {currency}
+                    {day.amount}
                   </Text>
                 )}
               />
@@ -118,7 +144,8 @@ const HomeScreen: React.FC = () => {
                           { color: calmBlueTheme.colors.primary },
                         ]}
                       >
-                        ₹{tx.amount}
+                        {currency}
+                        {tx.amount}
                       </Text>
                     )}
                     onPress={() =>
