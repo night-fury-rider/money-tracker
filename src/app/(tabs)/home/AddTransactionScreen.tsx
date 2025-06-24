@@ -1,6 +1,9 @@
 import APP_CONFIG from "$/constants/app.config.constants";
 import { ROUTES } from "$/constants/routes.constants";
-import { COMMON_STRS } from "$/constants/strings.constants";
+import {
+  ADD_TRANSACTION_SCREEN_STRS,
+  COMMON_STRS,
+} from "$/constants/strings.constants";
 import { formatDate } from "$/services/UtilService";
 import { useTransactionStore } from "$/stores/transactionStore";
 import { useCategoryStore } from "$/stores/useCategoryStore";
@@ -114,14 +117,14 @@ const AddTransactionScreen = () => {
       <View style={styles.form}>
         <View style={styles.topMargin} />
         <TextInput
-          label="Description"
+          label={ADD_TRANSACTION_SCREEN_STRS.description}
           value={description}
           onChangeText={setDescription}
           mode="outlined"
           style={styles.input}
         />
         <TextInput
-          label="Amount"
+          label={ADD_TRANSACTION_SCREEN_STRS.amount}
           value={amount}
           onChangeText={setAmount}
           keyboardType="numeric"
@@ -131,7 +134,7 @@ const AddTransactionScreen = () => {
 
         <TouchableOpacity onPress={() => setShowDatePicker(true)}>
           <TextInput
-            label="Date"
+            label={ADD_TRANSACTION_SCREEN_STRS.date}
             value={formattedDate || ""}
             mode="outlined"
             editable={false}
@@ -171,7 +174,7 @@ const AddTransactionScreen = () => {
                 { color: calmBlueTheme.colors.onSurface },
               ]}
             >
-              {category ? category.name : "Select Category"}
+              {category ? category.name : ADD_TRANSACTION_SCREEN_STRS.category}
             </Text>
           </View>
         </TouchableOpacity>
@@ -188,7 +191,7 @@ const AddTransactionScreen = () => {
             (!description || !amount || !category) && styles.disabledButton,
           ]}
         >
-          Save
+          {ADD_TRANSACTION_SCREEN_STRS.save}
         </Button>
       </View>
     </KeyboardAvoidingView>

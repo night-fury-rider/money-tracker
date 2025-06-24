@@ -14,7 +14,12 @@ const ADD_TRANSACTION_SCREEN_STRS = {
     categoryExists: "Category already exists",
     enterCategory: "Please enter a category name",
   },
+  amount: "Amount",
+  category: "Select Category",
   categoryParsingFailedFromParams: "Failed to parse categories from params",
+  date: "Date",
+  description: "Description",
+  save: "Save",
   title: "Add Transaction",
 };
 
