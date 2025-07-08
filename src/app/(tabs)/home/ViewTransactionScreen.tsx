@@ -4,11 +4,12 @@ import {
   COMMON_STRS,
   VIEW_TRANSACTION_SCREEN_STRS,
 } from "$/constants/strings.constants";
+import { getCategoryIconMap } from "$/services/CategoryService";
 import { formatDate } from "$/services/UtilService";
 import { useTransactionStore } from "$/stores/transactionStore";
 import { useCategoryStore } from "$/stores/useCategoryStore";
 import calmBlueTheme from "$/theme";
-import { ICategory } from "$/types";
+import { ICategory, ICategoryIconMap } from "$/types";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import * as SecureStore from "expo-secure-store";
@@ -30,21 +31,13 @@ import {
   useTheme,
 } from "react-native-paper";
 
-const categoryIconMap: Record<string, string> = {
-  Food: "food",
-  Transport: "bus",
-  Shopping: "cart",
-  Entertainment: "gamepad-variant",
-  Health: "heart-pulse",
-  Bills: "receipt",
-};
-
 const ViewTransactionScreen = () => {
   const theme = useTheme();
   const router = useRouter();
   const navigation = useNavigation();
   const params = useLocalSearchParams();
-  const { selectedCategory, setSelectedCategory } = useCategoryStore();
+  const { selectedCategory, setSelectedCategory, storeCategories } =
+    useCategoryStore();
   const { addTransaction, deleteTransaction, updateTransaction } =
     useTransactionStore();
 
@@ -59,6 +52,8 @@ const ViewTransactionScreen = () => {
   const [category, setCategory] = useState<ICategory | null>(null);
   const [dateFormat, setDateFormat] = useState(APP_CONFIG.dateFormats[0].value);
 
+  const [categoryIconMap, setCategoryIconMap] = useState<ICategoryIconMap>({});
+
   const [originalData, setOriginalData] = useState({
     amount: "",
     category: {
@@ -68,6 +63,9 @@ const ViewTransactionScreen = () => {
     date: new Date(),
     description: "",
   });
+  console.log(`params.transaction: ${JSON.stringify(params.transaction)}`);
+
+  console.log(`category: ${JSON.stringify(category)}`);
 
   useEffect(() => {
     const selectedTransaction = JSON.parse(params.transaction);
@@ -79,10 +77,12 @@ const ViewTransactionScreen = () => {
     setTransactionId(selectedTransaction.id);
 
     const catName = selectedTransaction.category;
+    console.log(`catName: ${catName.toLowerCase()}`);
     const categoryObj = {
       name: catName,
-      icon: categoryIconMap[catName] || "tag",
+      icon: categoryIconMap[catName.toLowerCase()] || "tag",
     };
+    console.log(`categoryObj in 1: ${JSON.stringify(categoryObj)}`);
     setCategory(categoryObj);
 
     setOriginalData({
@@ -112,11 +112,43 @@ const ViewTransactionScreen = () => {
   }, [selectedCategory]);
 
   useEffect(() => {
+    if (storeCategories) {
+      const newCategoryMap = getCategoryIconMap(storeCategories);
+      setCategoryIconMap(newCategoryMap);
+      updateCategoryDetails(newCategoryMap);
+    }
+  }, [storeCategories]);
+
+  useEffect(() => {
     if (params?.selectedCategory) {
       const selected = JSON.parse(params.selectedCategory as string);
       setCategory(selected);
     }
   }, [params?.selectedCategory]);
+
+  const updateCategoryDetails = (latestCategoryIconMap: ICategoryIconMap) => {
+    const selectedTransaction = JSON.parse(params.transaction);
+
+    const catName = selectedTransaction.category;
+
+    console.log(
+      `latestCategoryIconMap 2: ${JSON.stringify(latestCategoryIconMap)}`
+    );
+
+    const categoryObj = {
+      name: catName,
+      icon: latestCategoryIconMap[catName.toLowerCase()] || "tag",
+    };
+
+    console.log(`categoryObj 2: ${JSON.stringify(categoryObj)}`);
+
+    setCategory(categoryObj);
+
+    setOriginalData({
+      ...originalData,
+      category: categoryObj,
+    });
+  };
 
   const formattedDate = formatDate({ date, format: dateFormat });
 
@@ -253,7 +285,7 @@ const ViewTransactionScreen = () => {
           label="Description"
           value={description}
           mode="outlined"
-          style={styles.input}
+          style={[styles.input, isEditMode ? {} : styles.inputDisabled]}
           editable={isEditMode}
           onChangeText={setDescription}
         />
@@ -262,7 +294,7 @@ const ViewTransactionScreen = () => {
           value={amount}
           mode="outlined"
           keyboardType="numeric"
-          style={styles.input}
+          style={[styles.input, isEditMode ? {} : styles.inputDisabled]}
           editable={isEditMode}
           onChangeText={setAmount}
         />
@@ -275,7 +307,7 @@ const ViewTransactionScreen = () => {
             value={formattedDate || ""}
             mode="outlined"
             editable={false}
-            style={styles.input}
+            style={[styles.input, isEditMode ? {} : styles.inputDisabled]}
           />
         </TouchableOpacity>
 
@@ -288,41 +320,24 @@ const ViewTransactionScreen = () => {
           />
         )}
 
-        {/* <TouchableOpacity disabled style={styles.categoryButton}>
-          <View style={styles.categoryTextWrapper}>
-            <IconButton
-              icon={category?.icon || "tag"}
-              size={28}
-              iconColor={calmBlueTheme.colors.primary}
-            />
-            <Text
-              style={[
-                styles.categoryText,
-                { color: calmBlueTheme.colors.onSurface },
-              ]}
-            >
-              {category?.name || "No Category"}
-            </Text>
-          </View>
-        </TouchableOpacity> */}
-
         <TouchableOpacity
           disabled={!isEditMode}
           style={[
             styles.categoryButton,
-            {
-              backgroundColor: calmBlueTheme.colors.surface,
-              borderColor: calmBlueTheme.colors.outline,
-            },
+            ,
+            isEditMode ? {} : styles.inputDisabled,
           ]}
           onPress={openCategoryList}
         >
           <View style={styles.categoryTextWrapper}>
-            <IconButton
-              icon={category ? category.icon : "tag"}
-              size={28}
-              iconColor={calmBlueTheme.colors.primary}
-            />
+            {category?.icon ? (
+              <IconButton
+                icon={category.icon}
+                size={28}
+                iconColor={calmBlueTheme.colors.primary}
+              />
+            ) : null}
+
             <Text
               style={[
                 styles.categoryText,
@@ -372,6 +387,10 @@ const styles = StyleSheet.create({
     backgroundColor: calmBlueTheme.colors.surfaceVariant,
     borderRadius: 8,
     height: 55,
+  },
+  inputDisabled: {
+    backgroundColor: calmBlueTheme.colors.disabledBackground,
+    color: calmBlueTheme.colors.disabledText,
   },
   categoryButton: {
     marginBottom: 15,

@@ -4,6 +4,8 @@ const calmBlueTheme = {
   ...MD3LightTheme,
   colors: {
     ...MD3LightTheme.colors,
+    disabledBackground: "#F0F0F0",
+    disabledText: "#999999",
     primary: "#3A7CA5", // Main blue
     onPrimary: "#FFFFFF",
     background: "#F0F4F8", // Screen background
