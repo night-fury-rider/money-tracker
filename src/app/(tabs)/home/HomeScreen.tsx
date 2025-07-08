@@ -1,8 +1,11 @@
 import APP_CONFIG from "$/constants/app.config.constants";
 import { ROUTES } from "$/constants/routes.constants";
 import { HOME_SCREEN_STRS } from "$/constants/strings.constants";
+import { getCategoryIconMap } from "$/services/CategoryService";
 import { useTransactionStore } from "$/stores/transactionStore";
+import { useCategoryStore } from "$/stores/useCategoryStore";
 import calmBlueTheme from "$/theme";
+import { ICategoryIconMap } from "$/types";
 import { useRouter } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import React, { useEffect, useState } from "react";
@@ -17,28 +20,14 @@ import {
   Text,
 } from "react-native-paper";
 
-const getCategoryIcon = (category: string): string => {
-  switch (category.toLowerCase()) {
-    case "groceries":
-      return "cart";
-    case "transport":
-      return "car";
-    case "rent":
-      return "home";
-    case "utilities":
-      return "flash";
-    case "entertainment":
-      return "movie";
-    default:
-      return "cash";
-  }
-};
-
 const HomeScreen: React.FC = () => {
   const router = useRouter();
   const [monthData, setMonthData] = useState<IMonth | null>(null);
   const { data } = useTransactionStore();
+  const { storeCategories } = useCategoryStore();
   const [currency, setCurrency] = useState(APP_CONFIG.currencies[0].value);
+
+  const [categoryIconMap, setCategoryIconMap] = useState<ICategoryIconMap>({});
 
   // Load date format from SecureStore
   const getCurrency = async () => {
@@ -59,6 +48,12 @@ const HomeScreen: React.FC = () => {
   useEffect(() => {
     getCurrency();
   }, []);
+
+  useEffect(() => {
+    if (storeCategories) {
+      setCategoryIconMap(getCategoryIconMap(storeCategories));
+    }
+  }, [storeCategories]);
 
   useEffect(() => {
     const now = new Date();
@@ -135,7 +130,9 @@ const HomeScreen: React.FC = () => {
                     titleStyle={styles.txTitle}
                     descriptionStyle={styles.txDescription}
                     left={() => (
-                      <List.Icon icon={getCategoryIcon(tx.category)} />
+                      <List.Icon
+                        icon={categoryIconMap[tx.category.toLowerCase()]}
+                      />
                     )}
                     right={() => (
                       <Text
