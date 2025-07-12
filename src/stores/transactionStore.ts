@@ -22,6 +22,7 @@ export interface IDayGroup {
   amount: number;
   dateTimestamp: number;
   description: string;
+  id: string;
   title: string;
   transactions: ITransaction[];
 }
@@ -30,12 +31,14 @@ export interface IMonthGroup {
   amount: number;
   days: IDayGroup[];
   description: string;
+  id: string;
   title: string;
 }
 
 export interface IYearGroup {
   amount: number;
   description: string;
+  id: string;
   months: IMonthGroup[];
   title: string;
 }
@@ -54,18 +57,21 @@ export const useTransactionStore = create<ITransactionStore>((set, get) => ({
     // console.log(`addTransaction transaction: ${JSON.stringify(tx)}`);
 
     const transactionDate = new Date(tx.dateTimestamp);
+    const transactionYear = transactionDate?.getFullYear();
+    const transactionMonth = transactionDate?.getMonth() + 1;
+
     const updatedData = [...get().data];
 
     // Find or create year group
     let yearGroup = updatedData.find((y) => y.title === tx.date.year);
 
     if (!yearGroup) {
-      const yearTitle = `${transactionDate?.getFullYear()}`;
       yearGroup = {
         amount: 0,
-        description: yearTitle,
+        description: `${transactionYear}`,
+        id: `${transactionYear}`,
         months: [],
-        title: yearTitle,
+        title: `${transactionYear}`,
       };
       updatedData.push(yearGroup);
     }
@@ -76,7 +82,8 @@ export const useTransactionStore = create<ITransactionStore>((set, get) => ({
       monthGroup = {
         amount: 0,
         days: [],
-        description: `${transactionDate?.getMonth() + 1}`,
+        description: `${transactionMonth}`,
+        id: `${transactionYear}-${transactionMonth}`,
         title: tx.date.month,
       };
       yearGroup.months.push(monthGroup);
@@ -89,6 +96,7 @@ export const useTransactionStore = create<ITransactionStore>((set, get) => ({
         amount: 0,
         dateTimestamp: tx.dateTimestamp,
         description: APP_CONFIG.dayNames[transactionDate.getDay()],
+        id: `${transactionYear}-${transactionMonth}-${transactionDate.getDate()}`,
         title: tx.dateStr,
         transactions: [],
       };
@@ -112,6 +120,8 @@ export const useTransactionStore = create<ITransactionStore>((set, get) => ({
     // console.log(`deleteTransaction transaction: ${JSON.stringify(tx)}`);
 
     const transactionDate = new Date(tx.dateTimestamp);
+    const transactionYear = transactionDate?.getFullYear();
+    const transactionMonth = transactionDate?.getMonth() + 1;
 
     const updatedData = [...get().data];
 
@@ -120,9 +130,10 @@ export const useTransactionStore = create<ITransactionStore>((set, get) => ({
     if (!yearGroup) {
       yearGroup = {
         amount: 0,
-        description: "Yearly Summary",
+        description: `${transactionYear}`,
+        id: `${transactionYear}`,
         months: [],
-        title: tx.date.year,
+        title: `${transactionYear}`,
       };
       updatedData.push(yearGroup);
     }
@@ -133,7 +144,8 @@ export const useTransactionStore = create<ITransactionStore>((set, get) => ({
       monthGroup = {
         amount: 0,
         days: [],
-        description: "Monthly Summary",
+        description: `${transactionMonth}`,
+        id: `${transactionYear}-${transactionMonth}`,
         title: tx.date.month,
       };
       yearGroup.months.push(monthGroup);
@@ -148,6 +160,7 @@ export const useTransactionStore = create<ITransactionStore>((set, get) => ({
         amount: 0,
         dateTimestamp: tx.dateTimestamp,
         description: APP_CONFIG.dayNames[transactionDate.getDay()],
+        id: `${transactionYear}-${transactionMonth}-${transactionDate.getDate()}`,
         title: tx.dateStr,
         transactions: [],
       };
@@ -179,7 +192,10 @@ export const useTransactionStore = create<ITransactionStore>((set, get) => ({
   },
   updateTransaction: (tx: ITransaction) => {
     // console.log(`updateTransaction transaction: ${JSON.stringify(tx)}`);
+
     const transactionDate = new Date(tx.dateTimestamp);
+    const transactionYear = transactionDate?.getFullYear();
+    const transactionMonth = transactionDate?.getMonth() + 1;
 
     const updatedData = [...get().data];
 
@@ -188,9 +204,10 @@ export const useTransactionStore = create<ITransactionStore>((set, get) => ({
     if (!yearGroup) {
       yearGroup = {
         amount: 0,
-        description: "Yearly Summary",
+        description: `${transactionYear}`,
+        id: `${transactionYear}`,
         months: [],
-        title: tx.date.year,
+        title: `${transactionYear}`,
       };
       updatedData.push(yearGroup);
     }
@@ -201,7 +218,8 @@ export const useTransactionStore = create<ITransactionStore>((set, get) => ({
       monthGroup = {
         amount: 0,
         days: [],
-        description: "Monthly Summary",
+        description: `${transactionMonth}`,
+        id: `${transactionYear}-${transactionMonth}`,
         title: tx.date.month,
       };
       yearGroup.months.push(monthGroup);
@@ -215,6 +233,7 @@ export const useTransactionStore = create<ITransactionStore>((set, get) => ({
         amount: 0,
         dateTimestamp: tx.dateTimestamp,
         description: APP_CONFIG.dayNames[transactionDate.getDay()],
+        id: `${transactionYear}-${transactionMonth}-${transactionDate.getDate()}`,
         title: tx.dateStr,
         transactions: [],
       };
