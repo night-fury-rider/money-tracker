@@ -30,8 +30,9 @@ export const useCategoryStore = create<CategoryStore>((set, get) => ({
   setNewCategory: (newEntry) => {
     const currentCategories = get().storeCategories;
 
+    let updatedCategories;
     if (newEntry.parent) {
-      const updatedCategories = currentCategories.map((cat) => {
+      updatedCategories = currentCategories.map((cat) => {
         if (cat.name === newEntry.parent) {
           const updatedSubcategories = [
             ...(cat.subcategories || []),
@@ -46,12 +47,13 @@ export const useCategoryStore = create<CategoryStore>((set, get) => ({
       });
 
       set({ storeCategories: updatedCategories });
-      saveCategories(updatedCategories);
     } else {
+      updatedCategories = [...currentCategories, newEntry];
       set({
-        storeCategories: [...currentCategories, newEntry],
+        storeCategories: updatedCategories,
       });
     }
+    saveCategories(updatedCategories);
   },
 }));
 

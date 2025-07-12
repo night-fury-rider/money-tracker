@@ -27,6 +27,7 @@ const TopTabs = () => {
 
   const { data } = useTransactionStore();
   const { storeCategories } = useCategoryStore();
+
   const categoryIconMap = useMemo(
     () => getCategoryIconMap(storeCategories),
     [storeCategories]
