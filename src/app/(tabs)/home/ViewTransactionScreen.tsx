@@ -5,14 +5,14 @@ import {
   VIEW_TRANSACTION_SCREEN_STRS,
 } from "$/constants/strings.constants";
 import { getCategoryIconMap } from "$/services/CategoryService";
-import { formatDate } from "$/services/UtilService";
+import { formatDate } from "$/services/DateService";
+import StorageService from "$/stores/StorageService";
 import { useTransactionStore } from "$/stores/transactionStore";
 import { useCategoryStore } from "$/stores/useCategoryStore";
 import calmBlueTheme from "$/theme";
 import { ICategory, ICategoryIconMap } from "$/types";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
-import * as SecureStore from "expo-secure-store";
 import React, { useEffect, useLayoutEffect, useState } from "react";
 
 import {
@@ -23,21 +23,13 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import {
-  Button,
-  IconButton,
-  Text,
-  TextInput,
-  useTheme,
-} from "react-native-paper";
+import { Button, IconButton, Text, TextInput } from "react-native-paper";
 
 const ViewTransactionScreen = () => {
-  const theme = useTheme();
   const router = useRouter();
   const navigation = useNavigation();
   const params = useLocalSearchParams();
-  const { selectedCategory, setSelectedCategory, storeCategories } =
-    useCategoryStore();
+  const { selectedCategory, storeCategories } = useCategoryStore();
   const { addTransaction, deleteTransaction, updateTransaction } =
     useTransactionStore();
 
@@ -46,7 +38,7 @@ const ViewTransactionScreen = () => {
   const [amount, setAmount] = useState("");
   const [transactionId, setTransactionId] = useState("");
 
-  const [date, setDate] = useState(new Date());
+  const [transactionDate, setTransactionDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
 
   const [category, setCategory] = useState<ICategory | null>(null);
@@ -63,39 +55,34 @@ const ViewTransactionScreen = () => {
     date: new Date(),
     description: "",
   });
-  console.log(`params.transaction: ${JSON.stringify(params.transaction)}`);
-
-  console.log(`category: ${JSON.stringify(category)}`);
 
   useEffect(() => {
     const selectedTransaction = JSON.parse(params.transaction);
-    const transactionDate = new Date(selectedTransaction.date.day);
+    const newDate = new Date(selectedTransaction.date.day);
 
     setDescription(selectedTransaction.description);
     setAmount(String(selectedTransaction.amount));
-    setDate(transactionDate);
+    setTransactionDate(newDate);
     setTransactionId(selectedTransaction.id);
 
     const catName = selectedTransaction.category;
-    console.log(`catName: ${catName.toLowerCase()}`);
     const categoryObj = {
       name: catName,
       icon: categoryIconMap[catName.toLowerCase()] || "tag",
     };
-    console.log(`categoryObj in 1: ${JSON.stringify(categoryObj)}`);
     setCategory(categoryObj);
 
     setOriginalData({
       description: selectedTransaction.description,
       amount: String(selectedTransaction.amount),
       category: categoryObj,
-      date: transactionDate,
+      date: newDate,
     });
   }, []);
 
   useEffect(() => {
     const loadFormat = async () => {
-      const storedFormat = await SecureStore.getItemAsync(
+      const storedFormat = await StorageService.getItem(
         APP_CONFIG.storage.storageDateFormat
       );
       if (storedFormat) {
@@ -131,16 +118,10 @@ const ViewTransactionScreen = () => {
 
     const catName = selectedTransaction.category;
 
-    console.log(
-      `latestCategoryIconMap 2: ${JSON.stringify(latestCategoryIconMap)}`
-    );
-
     const categoryObj = {
       name: catName,
       icon: latestCategoryIconMap[catName.toLowerCase()] || "tag",
     };
-
-    console.log(`categoryObj 2: ${JSON.stringify(categoryObj)}`);
 
     setCategory(categoryObj);
 
@@ -150,12 +131,15 @@ const ViewTransactionScreen = () => {
     });
   };
 
-  const formattedDate = formatDate({ date, format: dateFormat });
+  const formattedDate = formatDate({
+    date: transactionDate,
+    format: dateFormat,
+  });
 
   const onDateChange = (event: any, selectedDate?: Date) => {
     setShowDatePicker(false);
     if (selectedDate) {
-      setDate(selectedDate);
+      setTransactionDate(selectedDate);
     }
   };
 
@@ -165,7 +149,7 @@ const ViewTransactionScreen = () => {
       params: {
         description,
         amount,
-        date: date.toISOString(),
+        date: transactionDate.toISOString(),
       },
     });
   };
@@ -193,12 +177,12 @@ const ViewTransactionScreen = () => {
       amount: parseFloat(amount),
       category: category?.name || COMMON_STRS.uncategorized,
       date: {
-        year: String(date.getFullYear()),
-        month: date.toLocaleString("default", { month: "long" }),
-        day: date.toISOString().split("T")[0],
+        year: String(transactionDate.getFullYear()),
+        month: transactionDate.toLocaleString("default", { month: "long" }),
+        day: transactionDate.toISOString().split("T")[0],
       },
       dateStr: formattedDate || "",
-      dateTimestamp: new Date(date).valueOf(),
+      dateTimestamp: new Date(transactionDate).valueOf(),
       description,
       id: transactionId,
       title: description,
@@ -211,7 +195,7 @@ const ViewTransactionScreen = () => {
       description !== originalData.description ||
       amount !== originalData.amount ||
       category?.name !== originalData.category.name ||
-      date.toString() !== originalData.date.toString()
+      transactionDate.toString() !== originalData.date.toString()
     );
   };
 
@@ -219,7 +203,7 @@ const ViewTransactionScreen = () => {
     setOriginalData({
       amount,
       category: category as ICategory,
-      date,
+      date: transactionDate,
       description,
     });
 
@@ -229,19 +213,19 @@ const ViewTransactionScreen = () => {
       amount: parseFloat(amount),
       category: category?.name || COMMON_STRS.uncategorized,
       date: {
-        year: String(date.getFullYear()),
-        month: date.toLocaleString("default", { month: "long" }),
-        day: date.toISOString().split("T")[0],
+        year: String(transactionDate.getFullYear()),
+        month: transactionDate.toLocaleString("default", { month: "long" }),
+        day: transactionDate.toISOString().split("T")[0],
       },
       dateStr: formattedDate || "",
-      dateTimestamp: new Date(date).valueOf(),
+      dateTimestamp: new Date(transactionDate).valueOf(),
       description,
       id: transactionId,
       title: description,
     };
 
     // If date is changed, delete the transaction from old day group.
-    if (date.toDateString() !== originalData.date.toDateString()) {
+    if (transactionDate.toDateString() !== originalData.date.toDateString()) {
       deleteTransaction({
         ...transactionObj,
         date: {
@@ -313,7 +297,7 @@ const ViewTransactionScreen = () => {
 
         {showDatePicker && (
           <DateTimePicker
-            value={date}
+            value={transactionDate}
             mode="date"
             display="default"
             onChange={onDateChange}

@@ -56,6 +56,7 @@ const HOME_SCREEN_STRS = {
     placeholder: "Search Item",
     noResults: "No Results",
   },
+  noData: "No transactions",
 };
 
 const SETTINGS_TAB_STRS = {

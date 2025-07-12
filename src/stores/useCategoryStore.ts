@@ -1,9 +1,8 @@
-// stores/useCategoryStore.ts
+import { create } from "zustand";
 
 import APP_CONFIG from "$/constants/app.config.constants";
 import { ICategory } from "$/types";
-import * as SecureStore from "expo-secure-store";
-import { create } from "zustand";
+import StorageService from "./StorageService";
 
 interface CategoryStore {
   storeCategories: ICategory[];
@@ -13,13 +12,13 @@ interface CategoryStore {
 }
 
 const saveCategories = (categories: ICategory[]) =>
-  SecureStore.setItemAsync(
+  StorageService.setItem(
     APP_CONFIG.storage.catgories,
     JSON.stringify(categories)
   );
 
 const loadCategories = async () => {
-  const stored = await SecureStore.getItemAsync(APP_CONFIG.storage.catgories);
+  const stored = await StorageService.getItem(APP_CONFIG.storage.catgories);
   return stored ? (JSON.parse(stored) as ICategory[]) : null;
 };
 

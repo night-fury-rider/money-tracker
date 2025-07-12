@@ -1,6 +1,7 @@
 import APP_CONFIG from "$/constants/app.config.constants";
+import { getDateKey, getMonthKey } from "$/services/DateService";
 import { create } from "zustand";
-import secureStorage from "./secureStorage";
+import StorageService from "./StorageService";
 
 interface ITransactionDate {
   year: string;
@@ -83,7 +84,7 @@ export const useTransactionStore = create<ITransactionStore>((set, get) => ({
         amount: 0,
         days: [],
         description: `${transactionMonth}`,
-        id: `${transactionYear}-${transactionMonth}`,
+        id: getMonthKey(transactionDate),
         title: tx.date.month,
       };
       yearGroup.months.push(monthGroup);
@@ -96,7 +97,7 @@ export const useTransactionStore = create<ITransactionStore>((set, get) => ({
         amount: 0,
         dateTimestamp: tx.dateTimestamp,
         description: APP_CONFIG.dayNames[transactionDate.getDay()],
-        id: `${transactionYear}-${transactionMonth}-${transactionDate.getDate()}`,
+        id: getDateKey(transactionDate),
         title: tx.dateStr,
         transactions: [],
       };
@@ -111,7 +112,7 @@ export const useTransactionStore = create<ITransactionStore>((set, get) => ({
 
     set({ data: updatedData });
 
-    secureStorage.setItem(
+    StorageService.setItem(
       APP_CONFIG.storage.storageAppData,
       JSON.stringify(updatedData)
     );
@@ -145,7 +146,7 @@ export const useTransactionStore = create<ITransactionStore>((set, get) => ({
         amount: 0,
         days: [],
         description: `${transactionMonth}`,
-        id: `${transactionYear}-${transactionMonth}`,
+        id: getMonthKey(transactionDate),
         title: tx.date.month,
       };
       yearGroup.months.push(monthGroup);
@@ -160,7 +161,7 @@ export const useTransactionStore = create<ITransactionStore>((set, get) => ({
         amount: 0,
         dateTimestamp: tx.dateTimestamp,
         description: APP_CONFIG.dayNames[transactionDate.getDay()],
-        id: `${transactionYear}-${transactionMonth}-${transactionDate.getDate()}`,
+        id: getDateKey(transactionDate),
         title: tx.dateStr,
         transactions: [],
       };
@@ -168,7 +169,7 @@ export const useTransactionStore = create<ITransactionStore>((set, get) => ({
     }
 
     let transactionIndex = dayGroup.transactions.findIndex(
-      (d) => d.id === tx.id
+      (obj) => obj.id === tx.id
     );
 
     let correctionAmount = dayGroup.transactions[transactionIndex].amount;
@@ -185,7 +186,7 @@ export const useTransactionStore = create<ITransactionStore>((set, get) => ({
 
     set({ data: updatedData });
 
-    secureStorage.setItem(
+    StorageService.setItem(
       APP_CONFIG.storage.storageAppData,
       JSON.stringify(updatedData)
     );
@@ -219,7 +220,7 @@ export const useTransactionStore = create<ITransactionStore>((set, get) => ({
         amount: 0,
         days: [],
         description: `${transactionMonth}`,
-        id: `${transactionYear}-${transactionMonth}`,
+        id: getMonthKey(transactionDate),
         title: tx.date.month,
       };
       yearGroup.months.push(monthGroup);
@@ -233,14 +234,16 @@ export const useTransactionStore = create<ITransactionStore>((set, get) => ({
         amount: 0,
         dateTimestamp: tx.dateTimestamp,
         description: APP_CONFIG.dayNames[transactionDate.getDay()],
-        id: `${transactionYear}-${transactionMonth}-${transactionDate.getDate()}`,
+        id: getDateKey(transactionDate),
         title: tx.dateStr,
         transactions: [],
       };
       monthGroup.days.push(dayGroup);
     }
 
-    let existingTransaction = dayGroup.transactions.find((d) => d.id === tx.id);
+    let existingTransaction = dayGroup.transactions.find(
+      (obj) => obj.id === tx.id
+    );
 
     if (existingTransaction) {
       const difference = tx.amount - existingTransaction.amount;
@@ -257,7 +260,7 @@ export const useTransactionStore = create<ITransactionStore>((set, get) => ({
 
     set({ data: updatedData });
 
-    secureStorage.setItem(
+    StorageService.setItem(
       APP_CONFIG.storage.storageAppData,
       JSON.stringify(updatedData)
     );

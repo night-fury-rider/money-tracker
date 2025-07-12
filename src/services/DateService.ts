@@ -49,4 +49,16 @@ function formatDate({
     .replace("SSS", milliseconds);
 }
 
-export { formatDate };
+const getMonthKey = (date: Date) =>
+  `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+
+const getDateKey = (date: Date) =>
+  `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
+    2,
+    "0"
+  )}-${date.getDate()}`;
+
+const getMonthTitle = (date: Date) =>
+  `${APP_CONFIG.monthNames[date.getMonth()].slice(0, 3)} ${date.getFullYear()}`;
+
+export { formatDate, getDateKey, getMonthKey, getMonthTitle };

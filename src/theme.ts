@@ -16,6 +16,12 @@ const calmBlueTheme = {
     elevation: {
       level2: "#E1ECF4",
     },
+    topTabs: {
+      activeColor: "#6200ee",
+      backgroundColor: "snow",
+      inactiveColor: "#222",
+      indicatorBackgroundColor: "#6200ee",
+    },
   },
 };
 

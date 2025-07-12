@@ -4,7 +4,8 @@ import {
   ADD_TRANSACTION_SCREEN_STRS,
   COMMON_STRS,
 } from "$/constants/strings.constants";
-import { formatDate } from "$/services/UtilService";
+import { formatDate } from "$/services/DateService";
+import StorageService from "$/stores/StorageService";
 import { useTransactionStore } from "$/stores/transactionStore";
 import { useCategoryStore } from "$/stores/useCategoryStore";
 import calmBlueTheme from "$/theme";
@@ -12,7 +13,6 @@ import { ICategory } from "$/types";
 
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import * as SecureStore from "expo-secure-store";
 import React, { useEffect, useState } from "react";
 import {
   KeyboardAvoidingView,
@@ -36,16 +36,16 @@ const AddTransactionScreen = () => {
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [dateFormat, setDateFormat] = useState(APP_CONFIG.dateFormats[0].value);
 
-  // Load date format from SecureStore
+  // Load date format from Storage
   const getDateFormat = async () => {
-    const storedFormat = await SecureStore.getItemAsync(
+    const storedFormat = await StorageService.getItem(
       APP_CONFIG.storage.storageDateFormat
     );
     if (storedFormat) {
       setDateFormat(storedFormat);
     } else {
       setDateFormat(APP_CONFIG.dateFormats[0].value);
-      await SecureStore.setItemAsync(
+      await StorageService.setItem(
         APP_CONFIG.storage.storageDateFormat,
         APP_CONFIG.dateFormats[0].value
       );

@@ -58,6 +58,20 @@ const APP_CONFIG = {
     "Friday",
     "Saturday",
   ],
+  monthNames: [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ],
   decimalPlaces: 2,
   font: {
     family: "IBM Plex Serif",
@@ -91,6 +105,7 @@ const APP_CONFIG = {
     storageLanguage: "language",
     storageNumberFormat: "numberFormat",
   },
+  yearRange: 5,
 };
 
 export default APP_CONFIG;

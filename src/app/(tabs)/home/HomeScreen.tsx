@@ -1,89 +1,15 @@
-import APP_CONFIG from "$/constants/app.config.constants";
+import TopTabs from "$/components/TopTabs/TopTabs";
 import { ROUTES } from "$/constants/routes.constants";
 import { HOME_SCREEN_STRS } from "$/constants/strings.constants";
-import { getCategoryIconMap } from "$/services/CategoryService";
-import { useTransactionStore } from "$/stores/transactionStore";
-import { useCategoryStore } from "$/stores/useCategoryStore";
 import calmBlueTheme from "$/theme";
-import { ICategoryIconMap } from "$/types";
 import { useRouter } from "expo-router";
-import * as SecureStore from "expo-secure-store";
-import React, { useEffect, useState } from "react";
-import { ScrollView, StyleSheet, View } from "react-native";
+import React from "react";
+import { StyleSheet, View } from "react-native";
 
-import {
-  Appbar,
-  Card,
-  FAB,
-  List,
-  Provider as PaperProvider,
-  Text,
-} from "react-native-paper";
+import { Appbar, FAB, Provider as PaperProvider } from "react-native-paper";
 
 const HomeScreen: React.FC = () => {
   const router = useRouter();
-  const [monthData, setMonthData] = useState<IMonth | null>(null);
-  const { data } = useTransactionStore();
-  const { storeCategories } = useCategoryStore();
-  const [currency, setCurrency] = useState(APP_CONFIG.currencies[0].value);
-
-  const [categoryIconMap, setCategoryIconMap] = useState<ICategoryIconMap>({});
-
-  // Load date format from SecureStore
-  const getCurrency = async () => {
-    const storedFormat = await SecureStore.getItemAsync(
-      APP_CONFIG.storage.storageCurrencyUnit
-    );
-    if (storedFormat) {
-      setCurrency(storedFormat);
-    } else {
-      setCurrency(APP_CONFIG.currencies[0].value);
-      await SecureStore.setItemAsync(
-        APP_CONFIG.storage.storageCurrencyUnit,
-        APP_CONFIG.currencies[0].value
-      );
-    }
-  };
-
-  useEffect(() => {
-    getCurrency();
-  }, []);
-
-  useEffect(() => {
-    if (storeCategories) {
-      setCategoryIconMap(getCategoryIconMap(storeCategories));
-    }
-  }, [storeCategories]);
-
-  useEffect(() => {
-    const now = new Date();
-    const currentMonthName = now.toLocaleString("default", { month: "long" });
-    const currentYear = now.getFullYear().toString();
-
-    const yearData = (data as any[]).find((year) => year.title === currentYear);
-    const thisMonth = yearData?.months.find(
-      (month: IMonth) => month.title === currentMonthName
-    );
-
-    if (thisMonth) {
-      const sortedDays = [...thisMonth.days].sort(
-        (a, b) => new Date(b.title).getTime() - new Date(a.title).getTime()
-      );
-
-      const sortedDaysWithSortedTx = sortedDays.map((day) => ({
-        ...day,
-        transactions: [...day.transactions].sort(
-          (a, b) =>
-            new Date(b.date.day).getTime() - new Date(a.date.day).getTime()
-        ),
-      }));
-
-      setMonthData({
-        ...thisMonth,
-        days: sortedDaysWithSortedTx,
-      });
-    }
-  }, [data]);
 
   const handleAddTransaction = () => {
     router.push(ROUTES.addTransactionScreen);
@@ -101,64 +27,7 @@ const HomeScreen: React.FC = () => {
           <Appbar.Action icon="calendar" onPress={() => {}} />
         </Appbar.Header>
 
-        <ScrollView contentContainerStyle={styles.container}>
-          {monthData?.days.map((day) => (
-            <Card key={day.title} style={styles.card} mode="elevated">
-              <List.Item
-                title={day.title}
-                description={day.description}
-                titleStyle={styles.cardTitle}
-                descriptionStyle={styles.cardDescription}
-                right={() => (
-                  <Text
-                    style={[
-                      styles.amountText,
-                      { color: calmBlueTheme.colors.primary },
-                    ]}
-                  >
-                    {currency}
-                    {day.amount}
-                  </Text>
-                )}
-              />
-              <View style={styles.transactionList}>
-                {day.transactions.map((tx, idx) => (
-                  <List.Item
-                    key={idx}
-                    title={tx.category}
-                    description={tx.description}
-                    titleStyle={styles.txTitle}
-                    descriptionStyle={styles.txDescription}
-                    left={() => (
-                      <List.Icon
-                        icon={categoryIconMap[tx.category.toLowerCase()]}
-                      />
-                    )}
-                    right={() => (
-                      <Text
-                        style={[
-                          styles.txAmount,
-                          { color: calmBlueTheme.colors.primary },
-                        ]}
-                      >
-                        {currency}
-                        {tx.amount}
-                      </Text>
-                    )}
-                    onPress={() =>
-                      router.push({
-                        pathname: ROUTES.viewTransactionScreen,
-                        params: {
-                          transaction: JSON.stringify(tx),
-                        },
-                      })
-                    }
-                  />
-                ))}
-              </View>
-            </Card>
-          ))}
-        </ScrollView>
+        <TopTabs />
 
         <FAB
           icon="plus"

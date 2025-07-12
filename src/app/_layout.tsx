@@ -12,9 +12,8 @@ import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import { PaperProvider } from "react-native-paper";
 
-import * as SecureStore from "expo-secure-store";
-
 import APP_CONFIG from "$/constants/app.config.constants";
+import StorageService from "$/stores/StorageService";
 import { useTransactionStore } from "$/stores/transactionStore";
 import { loadCategories, useCategoryStore } from "$/stores/useCategoryStore";
 import "react-native-reanimated";
@@ -36,7 +35,7 @@ export default function RootLayout() {
 
   useEffect(() => {
     (async () => {
-      const storedData = await SecureStore.getItemAsync(
+      const storedData = await StorageService.getItem(
         APP_CONFIG.storage.storageAppData
       );
       if (storedData) {
