@@ -9,12 +9,13 @@ import StorageService from "$/stores/StorageService";
 import { useTransactionStore } from "$/stores/transactionStore";
 import { useCategoryStore } from "$/stores/useCategoryStore";
 import calmBlueTheme from "$/theme";
-import { ICategory } from "$/types";
+import { ICategory, ITransaction } from "$/types";
 
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
+  FlatList,
   KeyboardAvoidingView,
   Platform,
   StyleSheet,
@@ -27,7 +28,7 @@ const AddTransactionScreen = () => {
   const router = useRouter();
   const params = useLocalSearchParams();
   const { selectedCategory, setSelectedCategory } = useCategoryStore();
-  const { addTransaction } = useTransactionStore();
+  const { addTransaction, data: transactionData } = useTransactionStore();
 
   const [description, setDescription] = useState("");
   const [amount, setAmount] = useState("");
@@ -35,6 +36,33 @@ const AddTransactionScreen = () => {
   const [category, setCategory] = useState<ICategory | null>(null);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [dateFormat, setDateFormat] = useState(APP_CONFIG.dateFormats[0].value);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [suggestionsCount, setSuggestionsCount] = useState(5);
+
+  const suggestions = useMemo(() => {
+    if (!description || description.length < 1) return [];
+    const allTransactions: ITransaction[] = transactionData.flatMap((year) =>
+      year.months.flatMap((month) =>
+        month.days.flatMap((day) => day.transactions)
+      )
+    );
+
+    const lowerDesc = description.toLowerCase();
+    const unique = new Map<string, ITransaction>();
+
+    allTransactions.forEach((tx) => {
+      const match = tx.description.toLowerCase().includes(lowerDesc);
+      if (match && !unique.has(tx.description)) {
+        unique.set(tx.description, tx);
+      }
+    });
+
+    const result = Array.from(unique.values()).slice(0, 5);
+
+    setSuggestionsCount(result.length >= 5 ? 5 : result.length);
+
+    return result;
+  }, [description, transactionData]);
 
   // Load date format from Storage
   const getDateFormat = async () => {
@@ -74,7 +102,7 @@ const AddTransactionScreen = () => {
   const handleSave = () => {
     addTransaction({
       amount: parseFloat(amount),
-      category: selectedCategory?.name || COMMON_STRS.uncategorized,
+      category: category?.name || COMMON_STRS.uncategorized,
       date: {
         year: String(date.getFullYear()),
         month: date.toLocaleString("default", { month: "long" }),
@@ -109,6 +137,18 @@ const AddTransactionScreen = () => {
     });
   };
 
+  const handleDescriptionChange = (text: string) => {
+    setDescription(text);
+    setShowSuggestions(true);
+  };
+
+  const handleSuggestionPress = (tx: ITransaction) => {
+    setDescription(tx.description);
+    setAmount(String(tx.amount));
+    setCategory({ name: tx.category, icon: "tag" });
+    setShowSuggestions(false);
+  };
+
   return (
     <KeyboardAvoidingView
       style={styles.container}
@@ -119,10 +159,33 @@ const AddTransactionScreen = () => {
         <TextInput
           label={ADD_TRANSACTION_SCREEN_STRS.description}
           value={description}
-          onChangeText={setDescription}
+          onChangeText={handleDescriptionChange}
           mode="outlined"
           style={styles.input}
         />
+        {showSuggestions && suggestions.length > 0 && (
+          <FlatList
+            data={suggestions}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => (
+              <TouchableOpacity
+                style={styles.suggestionItem}
+                onPress={() => handleSuggestionPress(item)}
+              >
+                <Text style={styles.suggestionText}>{item.description}</Text>
+                <Text style={styles.suggestionAmount}>
+                  {APP_CONFIG.currencies[0].value}
+                  {item.amount}
+                </Text>
+              </TouchableOpacity>
+            )}
+            style={[
+              styles.suggestionList,
+              { maxHeight: suggestionsCount * 50 },
+            ]}
+            keyboardShouldPersistTaps="handled"
+          />
+        )}
         <TextInput
           label={ADD_TRANSACTION_SCREEN_STRS.amount}
           value={amount}
@@ -151,7 +214,6 @@ const AddTransactionScreen = () => {
           />
         )}
 
-        {/* Category Select */}
         <TouchableOpacity
           style={[
             styles.categoryButton,
@@ -180,7 +242,6 @@ const AddTransactionScreen = () => {
         </TouchableOpacity>
       </View>
 
-      {/* Save Button */}
       <View style={styles.saveButtonWrapper}>
         <Button
           mode="contained"
@@ -246,6 +307,37 @@ const styles = StyleSheet.create({
   },
   disabledButton: {
     backgroundColor: calmBlueTheme.colors.outline,
+  },
+  suggestionList: {
+    borderRadius: 8,
+    marginTop: -10,
+    marginBottom: 15,
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 6,
+    elevation: 5,
+    zIndex: 10,
+    height: 50,
+  },
+  suggestionItem: {
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderBottomColor: "#eee",
+    borderBottomWidth: 1,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  suggestionText: {
+    fontSize: 15,
+    color: "#333",
+    flex: 1,
+  },
+  suggestionAmount: {
+    fontSize: 14,
+    fontWeight: "bold",
+    color: calmBlueTheme.colors.primary,
   },
 });
 

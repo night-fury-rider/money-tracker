@@ -1,4 +1,4 @@
-import { IMonthGroup, IYearGroup } from "$/stores/transactionStore";
+import { IMonthGroup, IYearGroup } from "$/types";
 
 const getMonthwiseData = (data: IYearGroup[]) => {
   let result = [] as IMonthGroup[];

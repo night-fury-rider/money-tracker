@@ -1,48 +1,8 @@
 import APP_CONFIG from "$/constants/app.config.constants";
 import { getDateKey, getMonthKey } from "$/services/DateService";
+import { ITransaction, IYearGroup } from "$/types";
 import { create } from "zustand";
 import StorageService from "./StorageService";
-
-interface ITransactionDate {
-  year: string;
-  month: string;
-  day: string;
-}
-export interface ITransaction {
-  amount: number;
-  category: string;
-  date: ITransactionDate;
-  dateStr: string;
-  dateTimestamp: number;
-  description: string;
-  id: string;
-  title: string;
-}
-
-export interface IDayGroup {
-  amount: number;
-  dateTimestamp: number;
-  description: string;
-  id: string;
-  title: string;
-  transactions: ITransaction[];
-}
-
-export interface IMonthGroup {
-  amount: number;
-  days: IDayGroup[];
-  description: string;
-  id: string;
-  title: string;
-}
-
-export interface IYearGroup {
-  amount: number;
-  description: string;
-  id: string;
-  months: IMonthGroup[];
-  title: string;
-}
 
 interface ITransactionStore {
   addTransaction: (tx: ITransaction) => void;
