@@ -183,7 +183,7 @@ const AddCategoryScreen = () => {
                   style={styles.iconOption}
                   onPress={() => selectIcon(item)}
                 >
-                  <List.Icon icon={item} />
+                  <List.Icon icon={item} style={styles.icon} />
                 </TouchableOpacity>
               )}
             />
@@ -208,6 +208,10 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     marginBottom: 20,
     color: "#3A7CA5",
+  },
+  icon: {
+    marginVertical: 0,
+    transform: [{ scale: 1.5 }],
   },
   input: {
     marginBottom: 12,
