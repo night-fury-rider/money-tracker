@@ -1,25 +1,22 @@
 import APP_CONFIG from "$/constants/app.config.constants";
-import {
-  ADD_CATEGORY_SCREEN_STRS,
-  ADD_TRANSACTION_SCREEN_STRS,
-} from "$/constants/strings.constants";
+import { ADD_CATEGORY_SCREEN_STRS } from "$/constants/strings.constants";
 import { useCategoryStore } from "$/stores/useCategoryStore";
+import calmBlueTheme from "$/theme";
 import { ICategory } from "$/types";
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
-
 import {
   FlatList,
-  Keyboard,
+  ScrollView,
   StyleSheet,
   TouchableOpacity,
   View,
 } from "react-native";
 import {
   Button,
-  List,
+  Card,
+  IconButton,
   Modal,
-  Provider as PaperProvider,
   Portal,
   Text,
   TextInput,
@@ -33,10 +30,10 @@ const AddCategoryScreen = () => {
 
   const [allCategories, setAllCategories] = useState<ICategory[]>([]);
   const [categoryName, setCategoryName] = useState("");
-  const [parentCategory, setParentCategory] = useState("");
-  const [filteredCategories, setFilteredCategories] = useState<ICategory[]>([]);
-  const [showSuggestions, setShowSuggestions] = useState(false);
-  const [selectedIcon, setSelectedIcon] = useState<string | null>(null);
+  const [selectedParent, setSelectedParent] = useState<ICategory | null>(null);
+  const [showParentPicker, setShowParentPicker] = useState(false);
+
+  const [selectedIcon, setSelectedIcon] = useState<string>("label");
   const [iconPickerVisible, setIconPickerVisible] = useState(false);
 
   useEffect(() => {
@@ -47,47 +44,14 @@ const AddCategoryScreen = () => {
         ) as ICategory[];
         setAllCategories(parsed);
       } catch (e) {
-        console.error(
-          ADD_TRANSACTION_SCREEN_STRS.categoryParsingFailedFromParams,
-          e
-        );
+        console.error("Failed to parse existing categories", e);
       }
     }
   }, [params.existingCategories]);
 
-  const handleParentCategoryChange = (text: string) => {
-    setParentCategory(text);
-
-    if (text.trim().length === 0) {
-      setFilteredCategories([]);
-      setShowSuggestions(false);
-      return;
-    }
-
-    const filtered = allCategories.filter((cat) =>
-      cat.name.toLowerCase().includes(text.toLowerCase())
-    );
-
-    setFilteredCategories(filtered);
-    setShowSuggestions(true);
-  };
-
-  const selectSuggestion = (suggestion: ICategory) => {
-    setParentCategory(suggestion.name);
-    setShowSuggestions(false);
-    Keyboard.dismiss();
-  };
-
-  const openIconPicker = () => setIconPickerVisible(true);
-
-  const selectIcon = (iconName: string) => {
-    setSelectedIcon(iconName);
-    setIconPickerVisible(false);
-  };
-
   const handleAddCategory = () => {
     if (!categoryName.trim()) {
-      alert(ADD_TRANSACTION_SCREEN_STRS.addCategoryOption.enterCategory);
+      alert("Please enter category name");
       return;
     }
 
@@ -96,165 +60,241 @@ const AddCategoryScreen = () => {
         (c) => c.name.toLowerCase() === categoryName.trim().toLowerCase()
       )
     ) {
-      alert(ADD_TRANSACTION_SCREEN_STRS.addCategoryOption.categoryExists);
+      alert("Category already exists");
       return;
     }
 
     setNewCategory({
-      name: categoryName,
+      name: categoryName.trim(),
       icon: selectedIcon || "label",
-      parent: parentCategory.trim() || undefined,
+      parent: selectedParent?.name,
     });
 
     router.back();
   };
 
+  /**
+   * New category name should not be
+   *  - same as existing one.
+   *  - less than 3 characters
+   */
+  const hasValidCategoryName = () => {
+    // New category name should not be same as existing one.
+    for (const category of allCategories) {
+      if (category.name === categoryName) {
+        return false;
+      }
+    }
+
+    return categoryName.length > 2;
+  };
+
   return (
-    <PaperProvider theme={theme}>
-      <View style={styles.container}>
-        <TextInput
-          label={ADD_CATEGORY_SCREEN_STRS.categoryInputLabel}
-          mode="outlined"
-          value={categoryName}
-          onChangeText={setCategoryName}
-          style={styles.input}
-          autoCapitalize="words"
-        />
-
-        <TextInput
-          label={ADD_CATEGORY_SCREEN_STRS.parentCategoryLabel}
-          mode="outlined"
-          value={parentCategory}
-          onChangeText={handleParentCategoryChange}
-          style={styles.input}
-          onFocus={() => setShowSuggestions(filteredCategories.length > 0)}
-        />
-
-        {showSuggestions && filteredCategories.length > 0 && (
-          <View style={styles.suggestionsContainer}>
-            <FlatList
-              keyboardShouldPersistTaps="handled"
-              data={filteredCategories}
-              keyExtractor={(item, index) => index.toString()}
-              renderItem={({ item }) => (
-                <TouchableOpacity
-                  onPress={() => selectSuggestion(item)}
-                  style={styles.suggestionItem}
-                >
-                  <Text>{item.name}</Text>
-                </TouchableOpacity>
-              )}
+    <ScrollView contentContainerStyle={styles.container}>
+      <Card style={styles.card}>
+        <Card.Content>
+          <View style={styles.inputWrapper}>
+            <IconButton
+              icon={selectedIcon}
+              size={28}
+              onPress={() => setIconPickerVisible(true)}
+              style={styles.iconButton}
+            />
+            <TextInput
+              label={ADD_CATEGORY_SCREEN_STRS.categoryInputLabel}
+              mode="outlined"
+              value={categoryName}
+              onChangeText={setCategoryName}
+              style={styles.input}
+              autoCapitalize="words"
             />
           </View>
-        )}
 
-        <Button
-          mode="outlined"
-          icon={selectedIcon || "tag"}
-          onPress={openIconPicker}
-          style={styles.iconButton}
-        >
-          {selectedIcon ? `Icon: ${selectedIcon}` : "Select Icon"}
-        </Button>
-
-        <Button
-          mode="contained"
-          onPress={handleAddCategory}
-          style={styles.addButton}
-        >
-          {ADD_CATEGORY_SCREEN_STRS.primaryBtnLabel}
-        </Button>
-
-        <Portal>
-          <Modal
-            visible={iconPickerVisible}
-            onDismiss={() => setIconPickerVisible(false)}
-            contentContainerStyle={styles.iconPickerModal}
+          <TouchableOpacity
+            style={[styles.dropdown, {}]}
+            onPress={() => setShowParentPicker(true)}
           >
-            <Text style={styles.iconPickerTitle}>
-              {ADD_CATEGORY_SCREEN_STRS.iconPickerTitle}
+            <Text variant="bodyLarge">
+              {selectedParent
+                ? selectedParent.name
+                : ADD_CATEGORY_SCREEN_STRS.parentCategoryLabel}
             </Text>
-            <FlatList
-              data={APP_CONFIG.icons}
-              keyExtractor={(item) => item}
-              numColumns={4}
-              renderItem={({ item }) => (
-                <TouchableOpacity
-                  style={styles.iconOption}
-                  onPress={() => selectIcon(item)}
-                >
-                  <List.Icon icon={item} style={styles.icon} />
-                </TouchableOpacity>
-              )}
-            />
-            <Button onPress={() => setIconPickerVisible(false)}>
-              {ADD_CATEGORY_SCREEN_STRS.cancel}
+
+            {selectedParent ? (
+              <IconButton
+                icon={"close"}
+                size={24}
+                onPress={() => setSelectedParent(null)}
+                style={[styles.iconButton, styles.iconClose]}
+              />
+            ) : (
+              <IconButton
+                icon={"chevron-down"}
+                size={24}
+                style={styles.iconButton}
+              />
+            )}
+          </TouchableOpacity>
+
+          {/* Save button appears only in edit mode and if values changed */}
+          {
+            <Button
+              mode="contained"
+              onPress={handleAddCategory}
+              disabled={!hasValidCategoryName()}
+              style={[
+                styles.saveButton,
+                !hasValidCategoryName() && styles.disabledButton,
+              ]}
+            >
+              {ADD_CATEGORY_SCREEN_STRS.primaryBtnLabel}
             </Button>
-          </Modal>
-        </Portal>
-      </View>
-    </PaperProvider>
+          }
+        </Card.Content>
+      </Card>
+
+      {/* Parent Category Modal */}
+      <Portal>
+        <Modal
+          visible={showParentPicker}
+          onDismiss={() => setShowParentPicker(false)}
+          contentContainerStyle={styles.modal}
+        >
+          <Text variant="titleMedium" style={styles.modalTitle}>
+            {ADD_CATEGORY_SCREEN_STRS.parentCategoryModalLabel}
+          </Text>
+          <FlatList
+            data={allCategories}
+            keyExtractor={(item, idx) => `${item.name}-${idx}`}
+            renderItem={({ item }) => (
+              <TouchableOpacity
+                style={styles.suggestionItem}
+                onPress={() => {
+                  setSelectedParent(item);
+                  setShowParentPicker(false);
+                }}
+              >
+                <IconButton
+                  icon={item.icon || "label"}
+                  size={20}
+                  style={styles.iconButtonInModal}
+                />
+                <Text style={{ marginLeft: 10 }}>{item.name}</Text>
+              </TouchableOpacity>
+            )}
+          />
+        </Modal>
+      </Portal>
+
+      {/* Icon Picker */}
+      <Portal>
+        <Modal
+          visible={iconPickerVisible}
+          onDismiss={() => setIconPickerVisible(false)}
+          contentContainerStyle={styles.modal}
+        >
+          <Text variant="titleMedium" style={styles.modalTitle}>
+            {ADD_CATEGORY_SCREEN_STRS.iconPickerTitle}
+          </Text>
+          <FlatList
+            data={APP_CONFIG.icons}
+            numColumns={4}
+            keyExtractor={(item) => item}
+            renderItem={({ item }) => (
+              <TouchableOpacity
+                style={styles.iconGridItem}
+                onPress={() => {
+                  setSelectedIcon(item);
+                  setIconPickerVisible(false);
+                }}
+              >
+                <IconButton icon={item || "label"} size={30} />
+              </TouchableOpacity>
+            )}
+          />
+        </Modal>
+      </Portal>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     padding: 20,
-    backgroundColor: "#F0F4F8",
+    backgroundColor: "#F9FAFB",
+    flexGrow: 1,
   },
-  title: {
-    fontSize: 26,
-    fontWeight: "700",
-    marginBottom: 20,
-    color: "#3A7CA5",
+  card: {
+    borderRadius: 12,
+    elevation: 4,
+    backgroundColor: "#FFFFFF",
   },
-  icon: {
-    marginVertical: 0,
-    transform: [{ scale: 1.5 }],
+  inputWrapper: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 12,
+  },
+  previewIcon: {
+    marginRight: 10,
+    color: "#444",
   },
   input: {
-    marginBottom: 12,
-    backgroundColor: "white",
+    flex: 1,
+    backgroundColor: "#fff",
   },
-  suggestionsContainer: {
-    maxHeight: 120,
-    backgroundColor: "white",
-    borderColor: "#ccc",
+  dropdown: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    borderColor: "#DDD",
     borderWidth: 1,
-    marginBottom: 20,
-    borderRadius: 6,
-  },
-  suggestionItem: {
-    paddingVertical: 10,
-    paddingHorizontal: 15,
-    borderBottomColor: "#eee",
-    borderBottomWidth: 1,
+    borderRadius: 8,
+    padding: 12,
+    marginVertical: 12,
+    backgroundColor: "#FAFAFA",
   },
   iconButton: {
-    marginBottom: 24,
+    marginVertical: 10,
+    borderWidth: 2,
+  },
+  iconButtonInModal: {
+    borderWidth: 2,
+  },
+  iconClose: {
+    borderWidth: 0,
   },
   addButton: {
-    marginTop: 10,
-    backgroundColor: "#3A7CA5",
+    marginTop: 20,
   },
-  iconPickerModal: {
-    backgroundColor: "white",
+  modal: {
+    backgroundColor: "#fff",
     marginHorizontal: 30,
     padding: 20,
-    borderRadius: 8,
+    borderRadius: 12,
     maxHeight: "80%",
   },
-  iconPickerTitle: {
-    fontSize: 20,
+  modalTitle: {
+    marginBottom: 10,
     fontWeight: "600",
-    marginBottom: 12,
-    color: "#3A7CA5",
   },
-  iconOption: {
-    flex: 1,
+  suggestionItem: {
+    flexDirection: "row",
     alignItems: "center",
-    padding: 10,
+    paddingVertical: 10,
+  },
+  iconGridItem: {
+    flex: 1 / 4,
+    alignItems: "center",
+    marginVertical: 12,
+  },
+
+  saveButton: {
+    borderRadius: 8,
+    backgroundColor: calmBlueTheme.colors.primary,
+    marginTop: 20,
+  },
+  disabledButton: {
+    backgroundColor: calmBlueTheme.colors.outline,
   },
 });
 

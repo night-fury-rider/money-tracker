@@ -5,6 +5,7 @@ const ADD_CATEGORY_SCREEN_STRS = {
   categoryInputLabel: "Category Name",
   iconPickerTitle: "Select an Icon",
   parentCategoryLabel: "Parent Category (optional)",
+  parentCategoryModalLabel: "Select Parent Category",
   primaryBtnLabel: "Add Category",
   title: "Add Category",
   cancel: "Cancel",
