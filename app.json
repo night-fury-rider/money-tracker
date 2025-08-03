@@ -16,7 +16,8 @@
         "foregroundImage": "./public/assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "package": "com.yuvrajpatil.apps.moneytracker"
     },
     "web": {
       "bundler": "metro",
@@ -37,6 +38,12 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "de223962-b1e0-4ad1-b57f-12a2774fa5c7"
+      }
     }
   }
 }
